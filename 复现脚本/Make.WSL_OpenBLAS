@@ -1,0 +1,35 @@
+# HPL 2.3 build configuration for Ubuntu/WSL, OpenMPI and OpenBLAS.
+SHELL        = /bin/sh
+CD           = cd
+CP           = cp
+LN_S         = ln -s
+MKDIR        = mkdir
+RM           = /bin/rm -f
+TOUCH        = touch
+
+ARCH         = WSL_OpenBLAS
+TOPdir       = /mnt/d/ASC_Final_Selection/sources/hpl-2.3
+INCdir       = $(TOPdir)/include
+BINdir       = $(TOPdir)/bin/$(ARCH)
+LIBdir       = $(TOPdir)/lib/$(ARCH)
+HPLlib       = $(LIBdir)/libhpl.a
+
+MPinc        = $(shell mpicc --showme:compile)
+MPlib        = $(shell mpicc --showme:link)
+LAinc        = -I/usr/include/x86_64-linux-gnu/openblas-pthread
+LAlib        = -lopenblas -lpthread -lm
+
+F2CDEFS      = -DAdd__ -DF77_INTEGER=int -DStringSunStyle
+HPL_INCLUDES = -I$(INCdir) -I$(INCdir)/$(ARCH) $(LAinc) $(MPinc)
+HPL_LIBS     = $(HPLlib) $(LAlib) $(MPlib)
+HPL_OPTS     = -DHPL_CALL_CBLAS -DHPL_DETAILED_TIMING
+HPL_DEFS     = $(F2CDEFS) $(HPL_OPTS) $(HPL_INCLUDES)
+
+CC           = mpicc
+CCNOOPT      = $(HPL_DEFS)
+CCFLAGS      = $(HPL_DEFS) -O3 -march=native -mtune=native -fomit-frame-pointer -funroll-loops
+LINKER       = mpicc
+LINKFLAGS    = $(CCFLAGS)
+ARCHIVER     = ar
+ARFLAGS      = r
+RANLIB       = ranlib
